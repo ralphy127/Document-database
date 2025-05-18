@@ -18,13 +18,15 @@ public:
     template<typename Filter>
     void remove(Filter&& filter);
 
-    std::vector<Document> getAll() const { return _documents; }
+    void insertVectorToDocument(std::vector<Document>& docs, std::string name, Document& doc);
+
+    std::vector<Document>& getAll() { return _documents; }
 
 private:
     std::string _name;
     std::vector<Document> _documents;
-    std::unordered_map<std::string, std::vector<size_t>> _indexes; // <field, index>
-    std::unordered_map<size_t, size_t> _ids; // <id, index>
+    std::unordered_map<std::string, std::vector<size_t>> _indexes;
+    std::unordered_set<size_t> _ids;
 
     std::mt19937_64 _rng{std::random_device{}()};
 
@@ -77,9 +79,9 @@ void Collection::update(Filter&& filter, Modifier&& modify) {
                 }
             }
 
-            auto id_opt = doc.get<size_t>("id");
-            if (id_opt) {
-                Logger::logInfo("Modified document of id: " + std::to_string(static_cast<int>(*id_opt)) + ".");
+            auto idOpt = doc.get<size_t>("id");
+            if (idOpt) {
+                Logger::logInfo("Modified document of id: " + std::to_string(static_cast<int>(*idOpt)) + ".");
             } else {
                 Logger::logWarning("Modified document with no id.");
             }

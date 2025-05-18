@@ -1,0 +1,13 @@
+{
+	vector (Document::Vector) : [
+		{
+			name (std::string) : Agnieszka
+			age (int) : 33
+			id (size_t) : 8377882629914541486
+		}
+	]
+
+	id (size_t) : 2381108303341643958
+	age (int) : 30
+	name (std::string) : Jan
+}

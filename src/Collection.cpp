@@ -13,7 +13,7 @@ void Collection::insert(Document doc) {
             }
         }
         
-        _ids[id] = pos;
+        _ids.insert(id);
         _documents.push_back(std::move(doc));
 
         Logger::logInfo("Added document of id: " + std::to_string(id) + ".");
@@ -21,6 +21,28 @@ void Collection::insert(Document doc) {
     catch(const std::runtime_error& e) {
         Logger::logError(e.what());
     }
+}
+
+void Collection::insertVectorToDocument(std::vector<Document>& docs, std::string name, Document& doc) {
+    try {
+        for(auto& d : docs) {
+            auto id = generateId();
+            d.set("id", id);
+            _ids.insert(id);
+        }
+
+        doc.set(std::move(name), std::move(docs));
+        
+        if(auto id = doc.get<size_t>("id")) {
+            Logger::logInfo("Added vector of " + std::to_string(docs.size()) + " documents to document of id: " + std::to_string(*id) + '.');
+        }
+        else {
+            Logger::logWarning("Added vector of " + std::to_string(docs.size()) + " documents to document of unknown id.");
+        }
+    }
+    catch(const std::runtime_error& e) {
+        Logger::logError(e.what());
+    } 
 }
 
 size_t Collection::generateId() {

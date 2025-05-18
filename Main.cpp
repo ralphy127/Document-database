@@ -1,3 +1,4 @@
+#include <Storage.hpp>
 #include "Collection.hpp"
 
 #include <iostream>
@@ -54,8 +55,23 @@ int main() {
         }
     );
 
+    for(auto& doc : collection.getAll()) {
+        Document nestedDoc;
+        nestedDoc.set("name", std::string("Agnieszka"));
+        nestedDoc.set("age", 33);
+        std::vector<Document> vec{nestedDoc};
+        collection.insertVectorToDocument(vec, "vector", doc); 
+    }
+
     for(const auto& doc : collection.getAll()) {
         doc.printInfo();
         std::cout << std::endl;
+    }
+
+    
+
+    Storage storage("../test_database");
+    for(const auto& doc : collection.getAll()) {
+        storage.saveDocument(doc);
     }
 }
