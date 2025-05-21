@@ -1,0 +1,5 @@
+{
+	id (size_t) : 13874720406315364869
+	number (int) : 0
+	name (std::string) : document_0
+}

@@ -7,20 +7,29 @@
 class Collection {
 public:
     Collection(std::string name) : _name(std::move(name)) {}
+
     void insert(Document doc);
 
     template<typename Filter, typename Modifier>
-    void update(Filter&& filter, Modifier&& modify);
+    std::vector<size_t> update(Filter&& filter, Modifier&& modify);
+
+    void update(Document& doc);
 
     template<typename Filter>
     std::vector<Document> find(Filter&& filter);
 
     template<typename Filter>
-    void remove(Filter&& filter);
+    std::vector<size_t> remove(Filter&& filter);
+
+    void remove(Document& doc);
 
     void insertVectorToDocument(std::vector<Document>& docs, std::string name, Document& doc);
 
-    std::vector<Document>& getAll() { return _documents; }
+    std::vector<Document> getAll() const { return _documents; }
+
+    std::string getName() const { return _name; }
+
+    std::optional<Document> getDocumentById(size_t id);
 
 private:
     std::string _name;
@@ -48,9 +57,11 @@ private:
 
 
 template<typename Filter, typename Modifier>
-void Collection::update(Filter&& filter, Modifier&& modify) {
+std::vector<size_t> Collection::update(Filter&& filter, Modifier&& modify) {
     assert_filter<Filter>();
     assert_modifier<Modifier>();
+
+    std::vector<size_t> idsUpdated;
 
     for(size_t pos{0}; pos < _documents.size(); ++pos) {
         auto& doc = _documents[pos];
@@ -81,19 +92,22 @@ void Collection::update(Filter&& filter, Modifier&& modify) {
 
             auto idOpt = doc.get<size_t>("id");
             if (idOpt) {
-                Logger::logInfo("Modified document of id: " + std::to_string(static_cast<int>(*idOpt)) + ".");
+                idsUpdated.push_back(*idOpt);
+                Logger::logInfo("Modified document of id: " + std::to_string(static_cast<size_t>(*idOpt)) + " in collection: " + _name + ".");
             } else {
-                Logger::logWarning("Modified document with no id.");
+                Logger::logWarning("Modified document with no id in collection: " + _name + '.');
             }
         }
     }
+
+    return idsUpdated;
 }
 
 template<typename Filter>
 std::vector<Document> Collection::find(Filter&& filter) {
     assert_filter<Filter>();
 
-    std::vector<Document> results{};
+    std::vector<Document> results;
     for(const auto& doc : _documents) {
         if(filter(doc)) {
             results.push_back(doc);
@@ -104,23 +118,26 @@ std::vector<Document> Collection::find(Filter&& filter) {
 }
 
 template<typename Filter>
-void Collection::remove(Filter&& filter) {
+std::vector<size_t> Collection::remove(Filter&& filter) {
     assert_filter<Filter>();
 
-    std::vector<size_t> toRemove{};
+    std::vector<size_t> toRemove;
     for(size_t i{0}; i < _documents.size(); ++i) {
         if(filter(_documents[i])) {
             toRemove.push_back(i);
         }
     }
 
+    std::vector<size_t> docIds;
+
     if(toRemove.empty()) {
-        Logger::logWarning("Trying to remove non existing document document.");
+        Logger::logWarning("Tried to remove non existing document in collection" + _name + '.');
     }
 
     for(auto it = toRemove.rbegin(); it != toRemove.rend(); ++it) {
         size_t i{*it};
         auto id = _documents[i].get<size_t>("id").value_or(0);
+        docIds.push_back(id);
 
         _ids.erase(id);
 
@@ -135,6 +152,8 @@ void Collection::remove(Filter&& filter) {
         }
 
         _documents.erase(_documents.begin() + i);
-        Logger::logInfo("Removed document of id: " + std::to_string(id) + ".");
+        Logger::logInfo("Removed document of id: " + std::to_string(id) + "in collection: " + _name + '.');
     }
+
+    return docIds;
 }

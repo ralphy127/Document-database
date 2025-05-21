@@ -4,22 +4,15 @@
 #include <variant>
 #include <type_traits>
 
-Storage::Storage(std::string collectionPath) : _collectionPath(std::move(collectionPath)) {
-    bool resetDirectory = true;
-    if(resetDirectory) {
-        removeDirectory(_collectionPath);
-    }
-    ensureDirectoryExists(_collectionPath);
-}
-
-void Storage::saveDocument(const Document& doc, size_t tabs) {
+void Storage::saveDocument(std::string collectionPath, const Document& doc, size_t tabs) {
+    
     auto idOpt = doc.get<size_t>("id");
     if(!idOpt) {
         throw std::runtime_error("Trying to save document without id.");
     }
 
     auto id = *idOpt;
-    std::ofstream file(_collectionPath + '/' + std::to_string(id) + ".txt");
+    std::ofstream file(collectionPath + '/' + std::to_string(id) + ".txt");
     if(!file.is_open()) {
         throw std::runtime_error("Cannot open a file to save document of id: " + std::to_string(id));
     }
@@ -92,25 +85,25 @@ void Storage::saveSingleDocument(const Document& doc, size_t tabs, std::ofstream
     file << "}";
 }
 
-void Storage::saveTabs(std::ofstream& file, size_t amount) {
-    for(size_t i{0}; i < amount; ++i) {
-        file << '\t';
-    }
-}
+void Storage::removeDocument(const std::filesystem::path& path, size_t id) {
+    auto filePath = path / (std::to_string(id) + ".txt");
 
-void Storage::ensureDirectoryExists(const std::filesystem::path& path) {
-    if (!std::filesystem::exists(path)) {
-        std::filesystem::create_directories(path);
-    }
-}
-
-void Storage::removeDirectory(const std::filesystem::path& dirPath) {
     try {
-        if(std::filesystem::exists(dirPath)) {
-            std::filesystem::remove_all(dirPath);
+        if(std::filesystem::exists(filePath)) {
+            std::filesystem::remove(filePath);
+            Logger::logInfo("Deleted document file: " + filePath.string());
+        } 
+        else {
+            Logger::logWarning("Document file not found: " + filePath.string());
         }
     }
     catch(const std::filesystem::filesystem_error& e) {
-        Logger::logError(e.what());
+        Logger::logError("Filesystem error while deleting document: " + std::string(e.what()));
+    }
+}
+
+void Storage::saveTabs(std::ofstream& file, size_t amount) {
+    for(size_t i{0}; i < amount; ++i) {
+        file << '\t';
     }
 }

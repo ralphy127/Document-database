@@ -16,4 +16,4 @@ public:
     static void logError(std::string_view message) {
         std::cout << "[ERROR] " << message << std::endl;
     }
-};  
+};

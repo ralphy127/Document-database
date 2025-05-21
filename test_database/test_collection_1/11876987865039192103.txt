@@ -1,0 +1,20 @@
+{
+	nestedDocs (Document::Vector) : [
+		{
+			number (int) : 0
+			name (std::string) : nested_0
+		}
+		{
+			number (int) : 1
+			name (std::string) : nested_1
+		}
+		{
+			number (int) : 2
+			name (std::string) : nested_2
+		}
+	]
+
+	name (std::string) : document_1
+	number (int) : 1
+	id (size_t) : 11876987865039192103
+}
