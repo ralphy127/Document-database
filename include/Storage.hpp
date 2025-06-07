@@ -6,12 +6,10 @@
 #include "Document.hpp"
 #include "Logger.hpp"
 
+// TODO loading and documentation
 class Storage {
 public:
-    std::vector<Document> loadDocuments(std::string collectionPath) {
-        std::string xd = collectionPath;
-        return std::vector<Document>();
-    }
+    std::vector<Document> loadDocuments(std::string collectionPath);
 
     void saveDocument(std::string collectionPath, const Document& doc, size_t tabs = 0);
 

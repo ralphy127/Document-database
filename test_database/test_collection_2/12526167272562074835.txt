@@ -1,0 +1,47 @@
+{
+	nestedDocs (Document::Vector) : [
+		[0]
+		{
+			number (int) : 0
+			name (std::string) : nested_0
+			id (size_t) : 83874144289562647
+		}
+		[1]
+		{
+			number (int) : 1
+			name (std::string) : nested_1
+			id (size_t) : 12917170294559764003
+		}
+		[2]
+		{
+			number (int) : 2
+			name (std::string) : nested_2
+			id (size_t) : 316956856605695197
+		}
+	]
+
+	mappedDocs (Document::Map) : {
+		key_0 : 
+		{
+			number (int) : 0
+			name (std::string) : mapped_0
+			id (size_t) : 16138790638605664726
+		}
+		key_2 : 
+		{
+			number (int) : 2
+			name (std::string) : mapped_2
+			id (size_t) : 17978313882910609125
+		}
+		key_1 : 
+		{
+			number (int) : 1
+			name (std::string) : mapped_1
+			id (size_t) : 10656443634445658548
+		}
+	}
+
+	name (std::string) : document_1
+	number (int) : 1
+	id (size_t) : 12526167272562074835
+}

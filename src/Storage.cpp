@@ -33,8 +33,10 @@ void Storage::saveSingleDocument(const Document& doc, size_t tabs, std::ofstream
         if(const auto* vectorType = std::get_if<Document::Vector>(&val)) {
             saveTabs(file, tabs + 1);
             file << key << " (Document::Vector) : [\n";
-            for(const auto& nestedDoc : *vectorType) {
-                saveSingleDocument(nestedDoc, tabs + 2, file);
+            for(size_t i{0}; i < (*vectorType).size(); ++i) {
+                saveTabs(file, tabs + 2);
+                file << '[' << i << "]\n";
+                saveSingleDocument((*vectorType)[i], tabs + 2, file);
                 file << '\n';
             }
             saveTabs(file, tabs + 1);
@@ -42,10 +44,10 @@ void Storage::saveSingleDocument(const Document& doc, size_t tabs, std::ofstream
         }
         else if(const auto* mapType = std::get_if<Document::Map>(&val)) {
             saveTabs(file, tabs + 1);
-            file << key << " (Document::Map>) : {\n";
+            file << key << " (Document::Map) : {\n";
             for(const auto& [subkey, subdoc] : *mapType) {
                 saveTabs(file, tabs + 2);
-                file << subkey << " : ";
+                file << subkey << " : \n";
                 saveSingleDocument(subdoc, tabs + 2, file);
                 file << '\n';
             }
@@ -73,7 +75,7 @@ void Storage::saveSingleDocument(const Document& doc, size_t tabs, std::ofstream
             file << key << " (std::string) : " << *stringType;
         }
         else if(auto id = doc.get<size_t>("id")) {
-            throw std::runtime_error("Trying to save document with wrong wariant type in document of id: " + std::to_string(*id) + '.');
+            throw std::runtime_error("Trying to save document with wrong wariant type in document of id: " + std::to_string(*id) + ".");
         }
         else {
             throw std::runtime_error("Trying to save document with wrong wariant type in document of unknown id.");
@@ -91,14 +93,14 @@ void Storage::removeDocument(const std::filesystem::path& path, size_t id) {
     try {
         if(std::filesystem::exists(filePath)) {
             std::filesystem::remove(filePath);
-            Logger::logInfo("Deleted document file: " + filePath.string());
+            Logger::logInfo("Deleted document file: " + filePath.string() + ".");
         } 
         else {
-            Logger::logWarning("Document file not found: " + filePath.string());
+            Logger::logWarning("Document file not found: " + filePath.string() + ".");
         }
     }
     catch(const std::filesystem::filesystem_error& e) {
-        Logger::logError("Filesystem error while deleting document: " + std::string(e.what()));
+        Logger::logError("Filesystem error while deleting document: " + std::string(e.what()) + ".");
     }
 }
 
@@ -106,4 +108,10 @@ void Storage::saveTabs(std::ofstream& file, size_t amount) {
     for(size_t i{0}; i < amount; ++i) {
         file << '\t';
     }
+}
+
+std::vector<Document> Storage::loadDocuments(std::string collectionPath){
+    // TODO
+    std::string xd = collectionPath;
+    return std::vector<Document>();
 }

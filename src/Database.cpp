@@ -47,20 +47,7 @@ void Database::insert(std::string collectionName, Document doc) {
     std::string path = _name + '/' + collectionName;
     _storage.saveDocument(path, doc);
     auto& collection = it->second;
-    collection.insert(std::move(doc));
-}
-
-void Database::insertVectorToDocument(std::string collectionName, std::vector<Document>& docs, std::string name, Document& doc) {
-    auto it = _collections.find(collectionName);
-    if(it == _collections.end()) {
-        Logger::logWarning(collectionName + " does not exisst.");
-        return;
-    }
-    
-    doc.set(name, std::move(docs));
-    std::string path = _name + '/' + collectionName;
-    _storage.saveDocument(path, doc);
-    it->second.insert(doc);
+    collection.insert(doc);
 }
 
 std::vector<Document> Database::getAll(std::string collectionName) const {

@@ -11,25 +11,47 @@
 
 class Document {
 public:
+    /// @brief Represents vector of documents
     using Vector = std::vector<Document>;
+
+    /// @brief Represents map: key - document's name, value - document
     using Map = std::unordered_map<std::string, Document>;
+
+    /// @brief Represents values which document is able to store
     using Value = std::variant<int, size_t, double, std::string, bool, Vector, Map>;
 
+    /// @brief Add and set document's property
+    /// @tparam T Property's typename
+    /// @param key Name of property
+    /// @param value Value of property
     template<typename T>
     void set(const std::string& key, const T& value);
 
+    /// @brief Get copy of document's property
+    /// @tparam T Property's typename
+    /// @param key Name of property
+    /// @return Copy of property's value
     template<typename T>
     std::optional<T> get(const std::string& key) const;
 
+    /// @brief Get document's data view
+    /// @return Constant map of properties
     const std::unordered_map<std::string, Value>& getDataView() const { return _data; }
 
-    void printInfo() const;
+    /// @brief Check if field exists
+    /// @param key Name of property
+    /// @return True if field exists, false otherwise
+    bool hasField(const std::string& key) const { return _data.find(key) != _data.end(); }
 
-    bool hasField(std::string_view key) const { return _data.find(std::string(key)) != _data.end(); }
+    // TODO remove func
 
 private:
+    /// @brief Data stored by document
     std::unordered_map<std::string, Value> _data;
 
+    /// @brief Check if type is valid
+    /// @tparam T 
+    /// @return True if T is one of variants of Document::Value, false otherwise
     template<typename T>
     static constexpr bool is_valid_type();
 };
