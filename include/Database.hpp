@@ -5,13 +5,18 @@
 class Database {
 public:
     /// @brief Construct a database
-    /// @param name Name of the database
-    Database(std::string name) : _name(std::move(name)) {}
+    /// @param name Path of the database
+    Database(std::string path);
     
     /// @brief Get mutable reference to collection
     /// @param collectionName Name of collection
     /// @return Optional reference to collection if it exists
     std::optional<std::reference_wrapper<Collection>> getCollection(std::string collectionName);
+
+    /// @brief Get copy of collection if exists
+    /// @param collectionName Name of collection
+    /// @return Optional collection copy if exists
+    std::optional<Collection> getCollectionCopy(std::string collectionName) const;
     
     /// @brief Add empty collection to database
     /// @param collectionName Name of new collection
@@ -49,6 +54,11 @@ public:
     /// @param filter Function filtering documents to remove
     template<typename Filter>
     void remove(std::string collectionName, Filter&& filter);
+
+    /// @brief Remove document from collection (by matching id)
+    /// @param collectionName Name of collection
+    /// @param doc Document to be removed from collection
+    void remove(std::string collectionName, Document& doc);
     
     /// @brief Insert container into a document within a collection
     /// @tparam Container Document::Map or Document::Vector
@@ -64,12 +74,16 @@ public:
     /// @return Vector of copies of all documents
     std::vector<Document> getAll(std::string collectionName) const;
     
-    /// @brief Get const copy of collection if exists
-    /// @param collectionName Name of collection
-    /// @return Optional collection copy if exists
-    std::optional<Collection> getCollection(std::string collectionName) const;
+    /// @brief Check id database is empty
+    /// @return Returns true if there is no collections, false otherwise
+    bool empty() const { return _collections.empty(); }
+
+    std::string getName() const { return _name; }
     
 private:
+    /// @brief Dataabase folder path
+    std::string _path;
+
     /// @brief Database name
     std::string _name;
     
@@ -78,7 +92,7 @@ private:
     
     /// @brief Object responsible for storing data
     Storage _storage;
-    
+
     /// @brief Ensure a directory exists on filesystem
     /// @param path Path to check
     /// @param reset If true, clears directory if exists
@@ -101,7 +115,7 @@ void Database::update(std::string collectionName, Filter&& filter, Modifier&& mo
     auto& collection = it->second;
     auto idsUpdated = collection.update(std::forward<Filter>(filter), std::forward<Modifier>(modify));
 
-    std::string path = _name + '/' + collectionName;
+    std::string path = _path + '/' + collectionName;
     for(const auto& id : idsUpdated) {
         auto docOpt = collection.getDocumentById(id);
         if(docOpt) {
@@ -134,7 +148,7 @@ void Database::remove(std::string collectionName, Filter&& filter) {
 
     auto docIds = collection.remove(std::forward<Filter>(filter));
 
-    std::string path = _name + '/' + collectionName;
+    std::string path = _path + '/' + collectionName;
     for(const auto id : docIds) {
         _storage.removeDocument(path, id);
     }
@@ -153,11 +167,11 @@ void Database::insertContainerToDocument(std::string collectionName, Container& 
     collection.fillContainerWithIds(container);
 
     doc.set(name, container);
-    std::string path = _name + '/' + collectionName;
+    std::string path = _path + '/' + collectionName;
     _storage.saveDocument(path, doc);
 
-    auto id = doc.get<size_t>("id").value_or(0);
-    if(id != 0 && collection.getDocumentById(id)) {
+    auto id = doc.get<size_t>("id");
+    if(id && collection.getDocumentById(*id)) {
         collection.update(doc);
     }
     else {

@@ -1,0 +1,32 @@
+{
+	id (size_t) : 11662632553692939626
+	name (std::string) : Complex One
+	metadata (Document::Map) : {
+		docs : 
+		{
+			id (size_t) : 4898295413163892200
+			value (Document::Vector) : [
+				[0]
+				{
+					id (size_t) : 17477269709212222072
+					meta (std::string) : A
+				}
+				[1]
+				{
+					id (size_t) : 15974215594320144200
+					meta (std::string) : B
+				}
+			]
+		}
+		active : 
+		{
+			id (size_t) : 7513508835935260401
+			value (bool) : true
+		}
+		version : 
+		{
+			id (size_t) : 13348152799504473188
+			value (double) : 1.2
+		}
+	}
+}

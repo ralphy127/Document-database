@@ -2,11 +2,18 @@
 
 void Collection::insert(Document& doc) {
     try {
-        auto id = generateId();
+        auto optId = doc.get<size_t>("id");
+        if (optId && _ids.find(*optId) != _ids.end()) {
+            Logger::logWarning("Document with id " + std::to_string(*optId) + " already exists in collection: " + _name + ".");
+            return;
+        }
+
+        auto id = optId.value_or(generateId());
         doc.set("id", id);
         
         _ids.insert(id);
-        _documents.push_back(std::move(doc));
+        fillDocumentWithIds(doc);
+        _documents.push_back(doc);
 
         Logger::logInfo("Added document of id: " + std::to_string(id) + " in collection: " + _name + ".");
     }
@@ -88,4 +95,31 @@ size_t Collection::generateId() {
     }
 
     throw std::runtime_error("Failed to generate unique document ID after " + std::to_string(maxIterations) + " attempts.");
+}
+
+void Collection::fillDocumentWithIds(Document& doc) {
+    if(!doc.hasField("id")) {
+        doc.set("id", generateId());
+    }
+
+    for(auto& [key, value] : doc.getData()) {
+        std::visit([&](auto& val) {
+            using T = std::decay_t<decltype(val)>;
+            if constexpr(std::is_same_v<T, Document>) {
+                fillDocumentWithIds(val);
+            } 
+            else if constexpr(std::is_same_v<T, Document::Vector>) {
+                fillContainerWithIds(val);
+                for(auto& d : val) {
+                    fillDocumentWithIds(d);
+                }
+            } 
+            else if constexpr(std::is_same_v<T, Document::Map>) {
+                fillContainerWithIds(val);
+                for(auto& [_, d] : val) {
+                    fillDocumentWithIds(d);
+                }
+            }
+        }, value);
+    }
 }

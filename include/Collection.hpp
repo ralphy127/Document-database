@@ -90,6 +90,10 @@ private:
     /// @return Id
     size_t generateId();
 
+    /// @brief Fill document with unique ids
+    /// @param document Document which nested documents to be filled
+    void fillDocumentWithIds(Document& document);
+
     /// @brief Check if Filter is of format: bool **Filter**(const Document&)
     /// @tparam Filter 
     template<typename Filter>
@@ -119,7 +123,6 @@ std::vector<size_t> Collection::update(Filter&& filter, Modifier&& modify) {
 
         if(filter(doc)) {
             modify(doc);
-
 
             auto idOpt = doc.get<size_t>("id");
             if (idOpt) {
@@ -178,6 +181,43 @@ std::vector<size_t> Collection::remove(Filter&& filter) {
 
     return docIds;
 }
+
+template<typename Container>
+void Collection::insertContainerToDocument(Container& container, std::string name, Document& doc) {
+    auto idOpt = doc.get<size_t>("id");
+    if(!idOpt.has_value()) {
+        size_t id = generateId();
+        doc.set("id", id);
+        idOpt = id;
+    }
+
+    size_t id = *idOpt;
+    fillContainerWithIds(container);
+
+    try {
+        doc.set(name, container);
+    } 
+    catch (const std::exception& e) {
+        Logger::logError("Failed to insert container into document with id: " + std::to_string(id) + " in collection: " + _name + ": " + e.what());
+        return;
+    }
+
+    auto it = std::find_if(_documents.begin(), _documents.end(), [&](const Document& d) {
+        auto existingId = d.get<size_t>("id");
+        return existingId && *existingId == id;
+    });
+
+    if(it != _documents.end()) {
+        *it = doc;
+        Logger::logInfo("Updated existing document with id: " + std::to_string(id) + " in collection: " + _name + ".");
+    } 
+    else {
+        _documents.push_back(doc);
+        _ids.insert(id);
+        Logger::logInfo("Inserted new document with id: " + std::to_string(id) + " in collection: " + _name + ".");
+    }
+}
+
 
 template<typename Container>
 void Collection::fillContainerWithIds(Container& container) {

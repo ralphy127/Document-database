@@ -1,5 +1,0 @@
-{
-	id (size_t) : 5175530754003186045
-	number (int) : 1
-	name (std::string) : document_1
-}

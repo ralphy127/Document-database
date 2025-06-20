@@ -1,0 +1,18 @@
+{
+	name (std::string) : Parent Document
+	id (size_t) : 12046592101877685826
+	children (Document::Vector) : [
+		[0]
+		{
+			id (size_t) : 5068995848164929015
+			name (std::string) : Child One
+			age (int) : 10
+		}
+		[1]
+		{
+			id (size_t) : 18221132508047129969
+			name (std::string) : Child Two
+			age (int) : 12
+		}
+	]
+}

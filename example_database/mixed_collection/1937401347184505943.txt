@@ -1,0 +1,15 @@
+{
+	id (size_t) : 1937401347184505943
+	info (Document::Map) : {
+		baz : 
+		{
+			id (size_t) : 14038015926369443653
+			value (int) : 42
+		}
+		foo : 
+		{
+			id (size_t) : 16732848855719775585
+			value (std::string) : bar
+		}
+	}
+}

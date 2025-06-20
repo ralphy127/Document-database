@@ -1,0 +1,49 @@
+{
+	id (size_t) : 2590493021271271924
+	name (std::string) : Document One
+	tags (Document::Vector) : [
+		[0]
+		{
+			id (size_t) : 16215473032948519952
+			value (int) : 1
+		}
+		[1]
+		{
+			id (size_t) : 1131442677419980080
+			value (int) : 2
+		}
+		[2]
+		{
+			id (size_t) : 12582559471081808428
+			value (int) : 2
+		}
+	]
+	address (Document::Map) : {
+		location : 
+		{
+			id (size_t) : 12588982323593267724
+			value (Document::Map) : {
+				zip : 
+				{
+					id (size_t) : 5949830813802727177
+					value (std::string) : 10001
+				}
+				city : 
+				{
+					id (size_t) : 14328615683318247780
+					value (std::string) : New York
+				}
+			}
+		}
+		number : 
+		{
+			id (size_t) : 16894724637987380709
+			value (int) : 42
+		}
+		street : 
+		{
+			id (size_t) : 262900194244711920
+			value (std::string) : Main Street
+		}
+	}
+}

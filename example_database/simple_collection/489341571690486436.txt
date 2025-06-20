@@ -1,0 +1,5 @@
+{
+	id (size_t) : 489341571690486436
+	title (std::string) : Simple Doc 1
+	value (int) : 123
+}

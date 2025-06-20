@@ -1,0 +1,21 @@
+{
+	id (size_t) : 12470193919145846578
+	description (std::string) : Mixed Doc with nested vector
+	numbers (Document::Vector) : [
+		[0]
+		{
+			id (size_t) : 1565750915039199524
+			value (int) : 10
+		}
+		[1]
+		{
+			id (size_t) : 8199213078400981776
+			value (int) : 20
+		}
+		[2]
+		{
+			id (size_t) : 5395094969479150699
+			value (int) : 30
+		}
+	]
+}
